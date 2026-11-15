@@ -1,0 +1,18 @@
+name = "board-api"
+main = "src/index.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+PUBLIC_USD = "1"
+PUBLIC_PER_VISITOR = "120"
+PUPKA_USD = "1"
+PUPKA_PER_VISITOR = "400"
+
+[[durable_objects.bindings]]
+name = "LIMITS"
+class_name = "Limits"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Limits"]
