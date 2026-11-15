@@ -4,7 +4,8 @@ import { SYSTEM, lessonMessage, moreMessage, replyMessage } from "./prompt.mjs";
 
 export { Limits } from "./limits.mjs";
 
-const DEFAULT_MODEL = "claude-haiku-5-5";
+const LESSON_MODEL = "claude-sonnet-5-5";
+const REPLY_MODEL = "claude-haiku-5-5";
 const USD_PER_MTOK = { "claude-haiku-5-5": [0.1, 0.5], "claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20] };
 const ORIGINS = ["https://board.gzowo.fun", "https://pupka.gzowo.fun"];
 const LOCAL = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
@@ -54,9 +55,9 @@ function cost(u, model) {
 
 function settings(env, p, kind) {
   const dev = env.DEV === "1" && p.debug ? p.debug : {};
-  const model = dev.model || env.BOARD_MODEL || DEFAULT_MODEL;
+  const model = dev.model || (kind === "reply" ? env.REPLY_MODEL || REPLY_MODEL : env.LESSON_MODEL || LESSON_MODEL);
   const thinking = dev.thinking || (kind === "reply" ? env.REPLY_THINKING : env.LESSON_THINKING) || "off";
-  const effort = dev.effort || (kind === "reply" ? env.REPLY_EFFORT : env.LESSON_EFFORT) || "medium";
+  const effort = dev.effort || (kind === "reply" ? env.REPLY_EFFORT : env.LESSON_EFFORT) || (model === "claude-haiku-5-5" ? "medium" : "low");
   return { model, effort, thinking: thinking === "on" || model !== "claude-haiku-5-5" ? { type: "adaptive" } : { type: "disabled" } };
 }
 
@@ -151,7 +152,7 @@ export default {
     const url = new URL(req.url);
     const path = url.pathname.replace(/\/+$/, "");
     if (req.method === "OPTIONS") return allowed(origin) ? new Response(null, { status: 204, headers: cors(origin) }) : new Response(null, { status: 403 });
-    if (path === "" || path === "/health") return json(allowed(origin) ? origin : "null", { ok: true, model: env.BOARD_MODEL || DEFAULT_MODEL, key: !!env.ANTHROPIC_API_KEY });
+    if (path === "" || path === "/health") return json(allowed(origin) ? origin : "null", { ok: true, lesson: env.LESSON_MODEL || LESSON_MODEL, reply: env.REPLY_MODEL || REPLY_MODEL, key: !!env.ANTHROPIC_API_KEY });
     if (!allowed(origin)) return new Response("forbidden", { status: 403 });
     if (path === "/draw" && req.method === "POST") return draw(req, env, ctx, origin);
     return json(origin, { error: "Nie ma takiej ścieżki." }, 404);

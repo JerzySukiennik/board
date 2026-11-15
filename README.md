@@ -6,7 +6,7 @@ Live: https://board.gzowo.fun · also built into Pupka (https://pupka.gzowo.fun,
 
 ## How it works
 
-- `worker/` is a Cloudflare Worker (`board-api`). It streams a script in a small board language from Claude (model set by `BOARD_MODEL`, default `claude-haiku-5-5`) and keeps a daily budget and per-visitor limits in a Durable Object.
+- `worker/` is a Cloudflare Worker (`board-api`). It streams a script in a small board language from Claude (`LESSON_MODEL`, default `claude-sonnet-5-5`, draws lessons; `REPLY_MODEL`, default `claude-haiku-5-5`, answers the student's marks) and keeps a daily budget and per-visitor limits in a Durable Object.
 - `board/` is the engine, shared with Pupka: it parses the script line by line while it streams, lays the steps out in columns, turns every command into wobbly hand-drawn SVG and plays it back stroke by stroke. `Niepotrzebne/sync-pupka.sh` copies it into Pupka.
 - The board language (`worker/src/prompt.mjs`): `step`, `say`, `note`, `key`, `wrong`, `ask`, `fig` and drawing commands such as `line`, `arrow`, `circle`, `curve`, `hatch`, `text`, `dim`, `angle`, `axes`, `plot`. The model never positions blocks; the app does.
 - Marks drawn by the student are sent as a picture of that part of the board plus the nearest board elements; the reply block is placed in free space next to them.

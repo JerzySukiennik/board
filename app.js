@@ -145,14 +145,14 @@ if (LOCAL) {
     const seg = document.createElement("div");
     seg.className = "seg";
     seg.title = "Tylko lokalnie: model do porównania";
-    seg.innerHTML = `<button data-model="claude-haiku-5-5">Haiku</button><button data-model="claude-sonnet-5-5">Sonnet</button>`;
+    seg.innerHTML = `<button data-model="">Mix</button><button data-model="claude-haiku-5-5">Haiku</button><button data-model="claude-sonnet-5-5">Sonnet</button>`;
     document.querySelector(".top-r").prepend(seg);
     const pick = (model) => {
-      board.opts.debug = { model, effort: model.includes("sonnet") ? "low" : "medium" };
+      board.opts.debug = model ? { model, effort: model.includes("sonnet") ? "low" : "medium" } : undefined;
       seg.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.model === model));
       store.set("board.localModel", model);
     };
-    seg.addEventListener("click", (ev) => ev.target.dataset.model && pick(ev.target.dataset.model));
-    pick(store.get("board.localModel", "claude-sonnet-5-5"));
+    seg.addEventListener("click", (ev) => ev.target.dataset.model !== undefined && pick(ev.target.dataset.model));
+    pick("");
   }
 }
